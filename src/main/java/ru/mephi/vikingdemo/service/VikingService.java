@@ -40,17 +40,14 @@ public class VikingService {
 
     /**
      * Создаёт викинга с конкретными параметрами из запроса
-     * Маппер превращает DTO в Viking, storage сохраняет в БД и возвращает с id
      */
     public Viking addViking(VikingCreateRequest request) {
-        // Превращаем DTO запроса в модель Viking (id = null — БД присвоит сама)
         Viking viking = vikingMapper.toVikingFromCreateRequest(request);
-        // Сохраняем и получаем обратно Viking уже с id из БД
         return vikingStorage.save(viking);
     }
 
     /**
-     * Частично обновляет викинга: только те поля, что не null в запросе.
+     * Частично обновляет викинга
      * Возвращает обновлённый Viking для ответа Клиенту и обновления GUI.
      */
     public Viking update(int id, VikingUpdateRequest request) {

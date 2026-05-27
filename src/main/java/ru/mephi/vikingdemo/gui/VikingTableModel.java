@@ -22,8 +22,7 @@ public class VikingTableModel extends AbstractTableModel {
     }
 
     /**
-     * Удаляет строку из таблицы по индексу строки.
-     * fireTableRowsDeleted сообщает Swing об удалении
+     * Удаляет строку из таблицы по индексу строки. fireTableRowsDeleted сообщает Swing об удалении
      */
     public void removeViking(int rowIndex) {
         data.remove(rowIndex);
@@ -31,8 +30,7 @@ public class VikingTableModel extends AbstractTableModel {
     }
 
     /**
-     * Заменяет строку в таблице по индексу строки обновлённым викингом.
-     * fireTableRowsUpdated сообщает Swing об изменении
+     * Заменяет строку в таблице по индексу строки обновлённым викингом. fireTableRowsUpdated сообщает Swing об изменении
      */
     public void updateViking(int rowIndex, Viking viking) {
         data.set(rowIndex, viking);
