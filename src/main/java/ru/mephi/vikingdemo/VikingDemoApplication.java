@@ -24,7 +24,7 @@ public class VikingDemoApplication {
         VikingService vikingService = context.getBean(VikingService.class);
         VikingListener vikingListener = context.getBean(VikingListener.class);
         VikingAnalyticsService analyticsService =
-                context.getBean(VikingAnalyticsService.class); // ← ДОБАВЛЕНО
+                context.getBean(VikingAnalyticsService.class);
 
         SwingUtilities.invokeLater(() -> {
             VikingDesktopFrame frame =

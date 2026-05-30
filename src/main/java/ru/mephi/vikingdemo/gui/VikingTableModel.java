@@ -21,26 +21,18 @@ public class VikingTableModel extends AbstractTableModel {
         fireTableRowsInserted(row, row);
     }
 
-    /**
-     * Удаляет строку из таблицы по индексу строки. fireTableRowsDeleted сообщает Swing об удалении
-     */
+
     public void removeViking(int rowIndex) {
         data.remove(rowIndex);
         fireTableRowsDeleted(rowIndex, rowIndex);
     }
 
-    /**
-     * Заменяет строку в таблице по индексу строки обновлённым викингом. fireTableRowsUpdated сообщает Swing об изменении
-     */
+
     public void updateViking(int rowIndex, Viking viking) {
         data.set(rowIndex, viking);
         fireTableRowsUpdated(rowIndex, rowIndex);
     }
 
-    /**
-     * Ищет индекс строки по id викинга.Возвращает -1 если не найден
-     * Используется в VikingDesktopFrame для поиска нужной строки.
-     */
     public int findRowById(int id) {
         for (int i = 0; i < data.size(); i++) {
             if (data.get(i).id() != null && data.get(i).id() == id) {

@@ -60,14 +60,15 @@ public class VikingAnalyticsService {
                 .count();
     }
 
-
-   // Считает викингов у которых ровно axeCount предметов снаряжения содержат ахе
+//1 или 2 топора (одновременно)
     public long countWithAxes(List<Viking> vikings, int axeCount) {
         return vikings.stream()
-                .filter(v -> v.equipment().stream()
-                        .filter(item -> item.name().toLowerCase().contains("axe"))
-                        .count() == axeCount
-                )
+                .filter(v -> {
+                    long axes = v.equipment().stream()
+                            .filter(item -> item.name().toLowerCase().contains("axe"))
+                            .count();
+                    return axes == 1 || axes == 2;
+                })
                 .count();
     }
 
@@ -92,10 +93,11 @@ public class VikingAnalyticsService {
                 .collect(Collectors.toList());
     }
 
-    // возвращает отсортированных рыжих викингов по возрастанию
+    // возвращает отсортированных рыжих + чтоб была борода викингов по возрастанию
     public List<Viking> getRedBeardsSortedByAge(List<Viking> vikings) {
         return vikings.stream()
-                .filter(v -> v.hairColor() == HairColor.Red)
+                .filter(v -> v.hairColor() == HairColor.Red
+                        && v.beardStyle() != BeardStyle.CLEAN_SHAVEN)
                 .sorted(Comparator.comparingInt(Viking::age))
                 .collect(Collectors.toList());
     }

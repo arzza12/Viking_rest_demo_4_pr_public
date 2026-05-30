@@ -8,7 +8,7 @@ import java.util.List;
 @Schema(description = "Модель викинга")
 public record Viking(
         @Schema(description = "ID викинга в базе данных", example = "1")
-        Integer id,           // ← ДОБАВЛЕНО: нужно для поиска строки в GUI при удалении/обновлении
+        Integer id,
         @Schema(description = "Имя викинга", example = "Bjorn")
         String name,
         @Schema(description = "Возраст", example = "31")
