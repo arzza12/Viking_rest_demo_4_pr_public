@@ -1,8 +1,10 @@
 package ru.mephi.vikingdemo.gui;
 
 import ru.mephi.vikingdemo.model.Viking;
+import ru.mephi.vikingdemo.service.VikingAnalyticsService;
 import ru.mephi.vikingdemo.service.VikingService;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,14 +22,17 @@ import java.util.List;
 public class VikingDesktopFrame extends JFrame {
 
     private final VikingService vikingService;
+    private final VikingAnalyticsService analyticsService;
     private final VikingTableModel tableModel = new VikingTableModel();
 
-    public VikingDesktopFrame(VikingService vikingService) {
+    public VikingDesktopFrame(VikingService vikingService,
+                              VikingAnalyticsService analyticsService) {
         this.vikingService = vikingService;
+        this.analyticsService = analyticsService;
 
         setTitle("Viking Demo");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(new Dimension(1100, 420)); // добавилась колонка ID
+        setSize(new Dimension(1100, 420));
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
@@ -39,11 +44,20 @@ public class VikingDesktopFrame extends JFrame {
         vikingTable.setRowHeight(28);
         add(new JScrollPane(vikingTable), BorderLayout.CENTER);
 
+        JPanel bottomPanel = new JPanel();
+
         JButton createButton = new JButton("Create random viking");
         createButton.addActionListener(event -> onCreateViking());
-
-        JPanel bottomPanel = new JPanel();
         bottomPanel.add(createButton);
+
+        JButton analyticsButton = new JButton("Аналитика");
+        analyticsButton.addActionListener(event -> onOpenAnalytics());
+        bottomPanel.add(analyticsButton);
+
+        JButton generateButton = new JButton("Сгенерировать N викингов");
+        generateButton.addActionListener(event -> onGenerateVikings());
+        bottomPanel.add(generateButton);
+
         add(bottomPanel, BorderLayout.SOUTH);
 
         onInit();
@@ -54,40 +68,77 @@ public class VikingDesktopFrame extends JFrame {
         tableModel.addViking(viking);
     }
 
+    private void onOpenAnalytics() {
+        VikingAnalyticsFrame analyticsFrame =
+                new VikingAnalyticsFrame(analyticsService);
+        analyticsFrame.setVisible(true);
+    }
+
+
+    private void onGenerateVikings() {
+        String input = JOptionPane.showInputDialog(
+                this,
+                "Введите количество викингов для генерации:",
+                "Генерация викингов",
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        // Пользователь нажал Отмена
+        if (input == null) return;
+
+        try {
+            int count = Integer.parseInt(input.trim());
+
+            if (count <= 0) {
+                JOptionPane.showMessageDialog(this,
+                        "Число должно быть больше 0",
+                        "Ошибка",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            List<Viking> generated = vikingService.generateAndSaveVikings(count);
+
+            // Добавляем каждого в таблицу гуи
+            generated.forEach(tableModel::addViking);
+
+            JOptionPane.showMessageDialog(this,
+                    "Успешно создано викингов: " + generated.size(),
+                    "Готово",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Пожалуйста, введите целое число",
+                    "Ошибка ввода",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     public void addNewViking(Viking viking) {
         tableModel.addViking(viking);
     }
 
-    /**
-     * Удаляет строку с викингом из таблицы по его id.
-     * Вызывается из VikingListener когда DELETE /api/vikings/{id} выполнен успешно.
-     * SwingUtilities.invokeLater обновление GUI всегда должно быть в EDT потоке,а REST-запрос приходит из другого потока (HTTP thread pool).
-     */
     public void removeViking(int id) {
         SwingUtilities.invokeLater(() -> {
             int rowIndex = tableModel.findRowById(id);
             if (rowIndex == -1) {
-                // Викинг не найден в таблице, тогда ниче не происходит
-                System.out.println("removeViking: строка с id=" + id + " не найдена в таблице");
+                System.out.println("removeViking: строка с id=" + id + " не найдена");
                 return;
             }
             tableModel.removeViking(rowIndex);
         });
     }
 
-    /**
-     * Обновляет строку викинга в таблице.
-     * Вызывается из VikingListener когда PATCH /api/vikings/{id} выполнен успешно.
-     */
     public void updateViking(Viking viking) {
         SwingUtilities.invokeLater(() -> {
             if (viking.id() == null) {
-                System.out.println("updateViking: viking.id() == null, обновление невозможно");
+                System.out.println("updateViking: viking.id() == null");
                 return;
             }
             int rowIndex = tableModel.findRowById(viking.id());
             if (rowIndex == -1) {
-                System.out.println("updateViking: строка с id=" + viking.id() + " не найдена в таблице");
+                System.out.println("updateViking: строка с id=" + viking.id() + " не найдена");
                 return;
             }
             tableModel.updateViking(rowIndex, viking);

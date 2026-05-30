@@ -2,6 +2,7 @@ package ru.mephi.vikingdemo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.mephi.vikingdemo.dto.VikingCreateRequest;
 import ru.mephi.vikingdemo.dto.VikingUpdateRequest;
 import ru.mephi.vikingdemo.model.Viking;
@@ -9,10 +10,11 @@ import ru.mephi.vikingdemo.repository.VikingMapper;
 import ru.mephi.vikingdemo.repository.VikingStorage;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class VikingService {
-    //каждый раз при изменении создается новая копия
 
     private final VikingFactory vikingFactory;
     private final VikingStorage vikingStorage;
@@ -22,7 +24,7 @@ public class VikingService {
     public VikingService(
             VikingFactory vikingFactory,
             VikingStorage vikingStorage,
-            VikingMapper vikingMapper   // добавлен для toVikingFromCreateRequest()
+            VikingMapper vikingMapper
     ) {
         this.vikingFactory = vikingFactory;
         this.vikingStorage = vikingStorage;
@@ -38,23 +40,26 @@ public class VikingService {
         return vikingStorage.save(viking);
     }
 
-    /**
-     * Создаёт викинга с конкретными параметрами из запроса
-     */
     public Viking addViking(VikingCreateRequest request) {
         Viking viking = vikingMapper.toVikingFromCreateRequest(request);
         return vikingStorage.save(viking);
     }
 
-    /**
-     * Частично обновляет викинга
-     * Возвращает обновлённый Viking для ответа Клиенту и обновления GUI.
-     */
     public Viking update(int id, VikingUpdateRequest request) {
         return vikingStorage.update(id, request);
     }
 
     public void deleteById(int id) {
         vikingStorage.deleteById(id);
+    }
+
+    //Генерирует и сохраняет в БД count случайных викингов.
+
+    @Transactional
+    public List<Viking> generateAndSaveVikings(int count) {
+        return IntStream.range(0, count)
+                .mapToObj(i -> vikingFactory.createRandomViking()) // генерация случайного викинга
+                .map(vikingStorage::save)                          // сохраняем в БД, получаем с id
+                .collect(Collectors.toList());                     // собираем результат
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.mephi.vikingdemo.dto.VikingCreateRequest;
@@ -65,10 +66,6 @@ public class VikingController {
         vikingListener.testAdd();
     }
 
-    /**
-     * POST /api/vikings создать викинга с конкретными параметрами.
-     * 201 успешное создание
-     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Создать викинга с заданными параметрами", operationId = "addViking")
@@ -79,15 +76,10 @@ public class VikingController {
     public Viking addViking(@RequestBody VikingCreateRequest request) {
         System.out.println("POST /api/vikings called, name=" + request.name());
         Viking created = vikingService.addViking(request);
-        // добавить строку в таблицу
         vikingListener.onVikingAdded(created);
         return created;
     }
 
-    /**
-     * DELETE /api/vikings/{id}
-     * 204 No Content усп удаление
-     */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Удалить викинга по id", operationId = "deleteViking")
@@ -101,14 +93,9 @@ public class VikingController {
     ) {
         System.out.println("DELETE /api/vikings/" + id + " called");
         vikingService.deleteById(id);
-        // Удалить строку из таблицы
         vikingListener.onVikingDeleted(id);
     }
 
-    /**
-     * PATCH /api/vikings/{id} обнов
-     * Обновляются только те поля, которые переданы в теле запроса (ненулевые).
-     */
     @PatchMapping("/{id}")
     @Operation(summary = "Частично обновить параметры викинга", operationId = "updateViking")
     @ApiResponses({
@@ -123,8 +110,30 @@ public class VikingController {
     ) {
         System.out.println("PATCH /api/vikings/" + id + " called");
         Viking updated = vikingService.update(id, request);
-        // обновляем строку в таблице
         vikingListener.onVikingUpdated(updated);
         return updated;
+    }
+
+
+    @PostMapping("/generate")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+            summary = "Сгенерировать N случайных викингов",
+            operationId = "generateVikings",
+            description = "Генерирует и сохраняет в БД указанное количество случайных викингов"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Викинги успешно созданы"),
+            @ApiResponse(responseCode = "400", description = "Некорректный параметр count")
+    })
+    public List<Viking> generateVikings(
+            @Parameter(description = "Количество викингов для генерации", example = "5")
+            @RequestParam(defaultValue = "1") int count
+    ) {
+        System.out.println("POST /api/vikings/generate?count=" + count + " called");
+        List<Viking> generated = vikingService.generateAndSaveVikings(count);
+        // каждый сгенерированный викинг добавляется в таблицу
+        generated.forEach(vikingListener::onVikingAdded);
+        return generated;
     }
 }
