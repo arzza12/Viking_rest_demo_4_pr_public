@@ -53,8 +53,6 @@ public class VikingService {
         vikingStorage.deleteById(id);
     }
 
-    //Генерирует и сохраняет в БД count случайных викингов.
-
     @Transactional
     public List<Viking> generateAndSaveVikings(int count) {
         return IntStream.range(0, count)

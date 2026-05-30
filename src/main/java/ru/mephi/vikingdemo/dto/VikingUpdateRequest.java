@@ -8,10 +8,7 @@ import ru.mephi.vikingdemo.model.HairColor;
 
 import java.util.List;
 
-/**
- * Тело PATCH-запроса для частичного обновления викинга.
- * Поле null = эт "не обновлять"
- */
+
 @Schema(description = "Запрос на частичное обновление викинга")
 public class VikingUpdateRequest {
 

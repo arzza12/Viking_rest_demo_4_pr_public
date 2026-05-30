@@ -6,14 +6,7 @@ import org.springframework.stereotype.Component;
 import ru.mephi.vikingdemo.gui.VikingDesktopFrame;
 import ru.mephi.vikingdemo.model.Viking;
 import ru.mephi.vikingdemo.service.VikingService;
-/**
- *
- * @author test2023
- */
 
-/**
- * После каждой операции обновляет таблицу Swing.
- */
 @Component
 public class VikingListener {
 
@@ -46,10 +39,7 @@ public class VikingListener {
         gui.addNewViking(viking);
     }
 
-    /**
-     * Вызывается контроллером после успешного DELETE /api/vikings/{id}.
-     * Удаляет строку с викингом из таблицы GUI.
-     */
+
     public void onVikingDeleted(int id) {
         if (gui == null) {
             System.out.println("onVikingDeleted: GUI ещё не инициализирован");
@@ -58,10 +48,7 @@ public class VikingListener {
         gui.removeViking(id);
     }
 
-    /**
-     * Вызывается контроллером после успешного PATCH /api/vikings/{id}.
-     * Обновляет строку викинга в таблице GUI.
-     */
+
     public void onVikingUpdated(Viking viking) {
         if (gui == null) {
             System.out.println("onVikingUpdated: GUI ещё не инициализирован");

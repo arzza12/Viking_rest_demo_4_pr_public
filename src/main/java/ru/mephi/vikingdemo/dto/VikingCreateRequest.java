@@ -8,9 +8,7 @@ import ru.mephi.vikingdemo.model.HairColor;
 
 import java.util.List;
 
-/**
- * Тело POST-запроса для создания викинга с конкретными параметрами. Все поля обязательны (кроме equipment).
- */
+
 @Schema(description = "Запрос на создание викинга")
 public record VikingCreateRequest(
         @Schema(description = "Имя викинга", example = "Ragnar", requiredMode = Schema.RequiredMode.REQUIRED)
