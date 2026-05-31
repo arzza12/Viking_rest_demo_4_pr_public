@@ -93,7 +93,7 @@ public class VikingAnalyticsService {
                 .collect(Collectors.toList());
     }
 
-    // возвращает отсортированных рыжих + чтоб была борода викингов по возрастанию
+    // возвращает отсортированных рыжих + чтоб была борода у  викингов по возрастанию
     public List<Viking> getRedBeardsSortedByAge(List<Viking> vikings) {
         return vikings.stream()
                 .filter(v -> v.hairColor() == HairColor.Red
